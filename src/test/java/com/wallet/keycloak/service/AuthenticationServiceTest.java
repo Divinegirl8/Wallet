@@ -52,6 +52,24 @@ class AuthenticationServiceTest {
     }
 
     @Test
+    public void test_That_A_User_Can_Register2() throws UsernameExistException, PhoneNumberExistException {
+        RegisterRequest request = registerRequest("mandy","mandy","lashes","password","password@gmail.com","090776000","12345");
+        RegisterResponse response = authenticationService.userRegistration(request);
+        log.info("{}->",response);
+        assertThat(response).isNotNull();
+    }
+
+    @Test
+    public void test_That_A_User_Can_Register3() throws UsernameExistException, PhoneNumberExistException {
+        RegisterRequest request = registerRequest("preshy","presh","glow","password","password@gmail.com","0907908797","12345");
+        RegisterResponse response = authenticationService.userRegistration(request);
+        log.info("{}->",response);
+        assertThat(response).isNotNull();
+    }
+
+
+
+    @Test
     public void test_That_A_User_Can_Login_If_Registered() throws LoginCredentialException {
         LoginRequest request = loginRequest("mandykay","password");
         LoginResponse response = authenticationService.login(request);

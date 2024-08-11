@@ -18,6 +18,7 @@ import com.wallet.keycloak.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -124,6 +125,11 @@ public class AuthenticationServiceApp implements AuthenticationService {
 
         Map responseEntity = restTemplate.exchange(introspectionEndpoint, HttpMethod.POST, entity, Map.class).getBody();
         return new IntrospectionResponse(responseEntity);
+    }
+
+    @Override
+    public User findUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("user does not exist"));
     }
 
     private Map getToken() {

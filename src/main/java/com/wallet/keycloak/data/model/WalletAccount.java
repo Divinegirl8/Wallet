@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
+@ToString
 @Setter
 @Getter
 @Entity
