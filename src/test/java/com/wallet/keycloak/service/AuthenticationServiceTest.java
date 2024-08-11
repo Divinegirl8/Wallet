@@ -5,6 +5,7 @@ import com.wallet.keycloak.dtos.request.RegisterRequest;
 import com.wallet.keycloak.dtos.response.LoginResponse;
 import com.wallet.keycloak.dtos.response.RegisterResponse;
 import com.wallet.keycloak.exception.LoginCredentialException;
+import com.wallet.keycloak.exception.PhoneNumberExistException;
 import com.wallet.keycloak.exception.UsernameExistException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -20,13 +21,15 @@ class AuthenticationServiceTest {
     @Autowired
     private AuthenticationService authenticationService;
 
-    public RegisterRequest registerRequest(String username,String firstname,String lastname,String password,String emailAddress){
+    public RegisterRequest registerRequest(String username,String firstname,String lastname,String password,String emailAddress,String phoneNumber,String pin){
         RegisterRequest registerRequest = new RegisterRequest();
         registerRequest.setUsername(username);
         registerRequest.setFirstname(firstname);
         registerRequest.setLastname(lastname);
         registerRequest.setPassword(password);
         registerRequest.setEmailAddress(emailAddress);
+        registerRequest.setPhoneNumber(phoneNumber);
+        registerRequest.setWalletPin(pin);
 
         return registerRequest;
     }
@@ -41,8 +44,8 @@ class AuthenticationServiceTest {
 
 
     @Test
-    public void test_That_A_User_Can_Register() throws UsernameExistException {
-        RegisterRequest request = registerRequest("mandykay","mandy","kiss","password","password@gmail.com");
+    public void test_That_A_User_Can_Register() throws UsernameExistException, PhoneNumberExistException {
+        RegisterRequest request = registerRequest("mandykay","mandy","kiss","password","password@gmail.com","0907768797","12345");
         RegisterResponse response = authenticationService.userRegistration(request);
         log.info("{}->",response);
         assertThat(response).isNotNull();

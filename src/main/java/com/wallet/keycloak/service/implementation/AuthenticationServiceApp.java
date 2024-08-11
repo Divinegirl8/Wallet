@@ -1,7 +1,9 @@
 package com.wallet.keycloak.service.implementation;
 
 import com.wallet.keycloak.data.model.User;
+import com.wallet.keycloak.data.model.WalletAccount;
 import com.wallet.keycloak.data.repository.UserRepository;
+import com.wallet.keycloak.dtos.request.CreateWalletRequest;
 import com.wallet.keycloak.dtos.request.LoginRequest;
 import com.wallet.keycloak.dtos.request.RegisterRequest;
 import com.wallet.keycloak.dtos.request.TokenRequest;
@@ -10,6 +12,7 @@ import com.wallet.keycloak.dtos.response.LoginResponse;
 import com.wallet.keycloak.dtos.response.LogoutResponse;
 import com.wallet.keycloak.dtos.response.RegisterResponse;
 import com.wallet.keycloak.exception.LoginCredentialException;
+import com.wallet.keycloak.exception.PhoneNumberExistException;
 import com.wallet.keycloak.exception.UsernameExistException;
 import com.wallet.keycloak.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
@@ -42,15 +45,19 @@ public class AuthenticationServiceApp implements AuthenticationService {
     private String logoutUrl;
     @Value("${keycloak.introspection_endpoint}")
     private String introspectionEndpoint;
+    private final WalletServiceApp walletServiceApp;
 
 
 
     @Override
-    public RegisterResponse userRegistration(RegisterRequest request) throws UsernameExistException {
+    public RegisterResponse userRegistration(RegisterRequest request) throws UsernameExistException, PhoneNumberExistException {
 
         if (usernameExist(request.getUsername())){
             throw new UsernameExistException("Username already exists, please choose another username.");
         }
+        CreateWalletRequest createWalletRequest = walletRequest(request.getPhoneNumber(),request.getFirstname(),request.getLastname(),request.getWalletPin());
+
+        WalletAccount walletAccount = walletServiceApp.createWalletAccount(createWalletRequest);
 
         var user = User.builder()
                 .username(request.getUsername())
@@ -58,14 +65,18 @@ public class AuthenticationServiceApp implements AuthenticationService {
                 .lastname(request.getLastname())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .emailAddress(request.getEmailAddress())
+                .phoneNumber(request.getPhoneNumber())
+                .walletPin(request.getWalletPin())
+                .walletAccount(walletAccount)
                 .build();
         userRepository.save(user);
 
         String accessTokenValue = accessToken();
         String refreshTokenValue = refreshToken();
+        String accountNumber = user.getWalletAccount().getWalletNumber();
 
 
-        return new RegisterResponse("User registration successful",accessTokenValue,refreshTokenValue,user.getId().toString());
+        return new RegisterResponse("User registration successful",accountNumber,accessTokenValue,refreshTokenValue,user.getId().toString());
     }
 
     @Override
@@ -166,5 +177,15 @@ public class AuthenticationServiceApp implements AuthenticationService {
         User user = userRepository.findByUsername(username);
 
         return user != null;
+    }
+
+    private CreateWalletRequest walletRequest(String accountNumber,String firstName, String lastName,String pin){
+        CreateWalletRequest createWalletRequest = new CreateWalletRequest();
+
+        createWalletRequest.setWalletNumber(accountNumber);
+        createWalletRequest.setFullName(firstName + " " + lastName);
+        createWalletRequest.setPin(pin);
+
+        return createWalletRequest;
     }
 }

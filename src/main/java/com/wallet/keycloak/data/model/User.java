@@ -1,10 +1,7 @@
 package com.wallet.keycloak.data.model;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -26,4 +23,8 @@ public class User {
     private String lastname;
     private String password;
     private String emailAddress;
+    private String phoneNumber;
+    private String walletPin;
+    @OneToOne
+    private WalletAccount walletAccount;
 }

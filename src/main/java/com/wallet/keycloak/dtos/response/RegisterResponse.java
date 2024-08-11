@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class RegisterResponse {
     private String message;
+    private String walletAccountNumber;
     private String accessToken;
     private String refreshToken;
     private String userId;
