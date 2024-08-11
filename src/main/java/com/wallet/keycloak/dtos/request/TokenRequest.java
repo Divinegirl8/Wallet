@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class RegisterResponse {
-    private String message;
+public class TokenRequest {
+    private String token;
 }
